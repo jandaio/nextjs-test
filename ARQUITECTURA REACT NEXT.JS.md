@@ -97,6 +97,8 @@ https://www.youtube.com/watch?v=lJxU3-61F2I
 data fetching
 https://nextjs.org/docs/app/building-your-application/data-fetching/fetching
 
+SERVER ACTIONS
+
 ailed to compile
 ./node_modules\@restart\hooks\esm\useCallbackRef.js
 ReactServerComponentsError:

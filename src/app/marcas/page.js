@@ -1,11 +1,11 @@
-import AbmMarcas from "../../clientComponents/abmMarcas"
+import ListaMarcas from "../clientComponents/listaMarcas"
 
 
 async function getMarcas() {
     const cache = {};
     //{ cache: 'no-store' }
 
-    const res = await fetch('https://www.marlew.com.ar/api/queries/getBrands.json', cache);
+    const res = await fetch('http://localhost:3000/api/marcas', cache);
 
     if (!res.ok) throw new Error('Failed to fetch data');
 
@@ -19,9 +19,7 @@ export default async function Page() {
 
     return (
         <>
-            <h3>Marcas:</h3>
-
-            <AbmMarcas data={marcas} />
+            <ListaMarcas data={marcas} />
         </>
 
 
