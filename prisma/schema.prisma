@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = "mysql://root@localhost:3306/cables_shop"
+}
+
+model cable_types {
+  cable_type_id Int        @id @default(autoincrement())
+  name          String     @db.VarChar(100)
+  description   String     @db.VarChar(255)
+  products      products[]
+}
+
+model packages {
+  package_id  Int        @id @default(autoincrement())
+  name        String     @db.VarChar(50)
+  description String     @db.VarChar(255)
+  supplies    supplies[]
+}
+
+model products {
+  product_id     Int         @id @default(autoincrement())
+  name           String      @db.VarChar(100)
+  description    String      @db.Text
+  price          Decimal     @db.Decimal(10, 2)
+  cable_type_id  Int
+  image_url      String      @db.VarChar(255)
+  create_date    DateTime    @db.Date
+  bar_code       String      @db.VarChar(50)
+  internal_code  String      @db.VarChar(50)
+  quantity       Int
+  stock_quantity Int
+  cable_types    cable_types @relation(fields: [cable_type_id], references: [cable_type_id], onUpdate: Restrict, map: "products_ibfk_1")
+
+  @@index([cable_type_id], map: "cable_type_id")
+}
+
+model stock_supplies {
+  stock_supply_id Int      @id @default(autoincrement())
+  supply_id       Int
+  quantity        Int
+  supplies        supplies @relation(fields: [supply_id], references: [supply_id], onUpdate: Restrict, map: "stock_supplies_ibfk_1")
+
+  @@index([supply_id], map: "supply_id")
+}
+
+model suppliers {
+  supplier_id Int        @id @default(autoincrement())
+  name        String     @db.VarChar(100)
+  location    String     @db.VarChar(255)
+  email       String     @db.VarChar(100)
+  website     String     @db.VarChar(100)
+  phone       String     @db.VarChar(20)
+  supplies    supplies[]
+}
+
+model supplies {
+  supply_id      Int              @id @default(autoincrement())
+  supplier_id    Int
+  package_id     Int
+  price          Decimal          @db.Decimal(10, 2)
+  bar_code       String           @db.VarChar(50)
+  description    String           @db.Text
+  package_type   String           @db.VarChar(50)
+  stock_supplies stock_supplies[]
+  suppliers      suppliers        @relation(fields: [supplier_id], references: [supplier_id], onUpdate: Restrict, map: "supplies_ibfk_1")
+  packages       packages         @relation(fields: [package_id], references: [package_id], onUpdate: Restrict, map: "supplies_ibfk_2")
+
+  @@index([package_id], map: "package_id")
+  @@index([supplier_id], map: "supplier_id")
+}
