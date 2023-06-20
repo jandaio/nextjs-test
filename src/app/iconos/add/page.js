@@ -26,7 +26,7 @@ export default async function Page() {
 
 
     try {
-      const response = await fetch('/api/iconos/add', {
+      const response = await fetch('/api/post', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

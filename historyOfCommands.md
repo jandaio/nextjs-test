@@ -16,6 +16,8 @@ https://www.prisma.io/docs/getting-started/setup-prisma/add-to-existing-project/
 
 - command : npx prisma db pull
 
+## STUDIO BROWSWER
+
 npx prisma studio
 
 # CLIENTE PARA NODE (REACT, NEXT.JS ...)
