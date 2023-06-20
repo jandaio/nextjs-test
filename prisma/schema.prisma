@@ -4,71 +4,338 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = "mysql://root@localhost:3306/cables_shop"
+  url      = "mysql://root@localhost:3306/marlewweb"
 }
 
-model cable_types {
-  cable_type_id Int        @id @default(autoincrement())
-  name          String     @db.VarChar(100)
-  description   String     @db.VarChar(255)
-  products      products[]
+model aplicaciones {
+  id                    Int                     @id @default(autoincrement())
+  nombre_es             String                  @db.VarChar(500)
+  nombre_en             String                  @db.VarChar(500)
+  orden                 Int?
+  created               DateTime?               @db.DateTime(0)
+  modified              DateTime?               @db.DateTime(0)
+  aplicaciones_familias aplicaciones_familias[]
 }
 
-model packages {
-  package_id  Int        @id @default(autoincrement())
-  name        String     @db.VarChar(50)
-  description String     @db.VarChar(255)
-  supplies    supplies[]
+model aplicaciones_familias {
+  id            Int          @id @default(autoincrement())
+  familia_id    Int
+  aplicacion_id Int
+  aplicaciones  aplicaciones @relation(fields: [aplicacion_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_aplicaciones_familias_aplicaciones")
+  familias      familias     @relation(fields: [familia_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_aplicaciones_familias_familias")
+
+  @@index([aplicacion_id], map: "FK_aplicaciones_familias_aplicaciones")
+  @@index([familia_id], map: "FK_aplicaciones_familias_familias")
 }
 
-model products {
-  product_id     Int         @id @default(autoincrement())
-  name           String      @db.VarChar(100)
-  description    String      @db.Text
-  price          Decimal     @db.Decimal(10, 2)
-  cable_type_id  Int
-  image_url      String      @db.VarChar(255)
-  create_date    DateTime    @db.Date
-  bar_code       String      @db.VarChar(50)
-  internal_code  String      @db.VarChar(50)
-  quantity       Int
-  stock_quantity Int
-  cable_types    cable_types @relation(fields: [cable_type_id], references: [cable_type_id], onUpdate: Restrict, map: "products_ibfk_1")
-
-  @@index([cable_type_id], map: "cable_type_id")
+model categorias {
+  id        Int       @id @default(autoincrement())
+  nombre_es String    @db.VarChar(250)
+  nombre_en String    @db.VarChar(250)
+  clave_es  String    @db.VarChar(250)
+  clave_en  String    @db.VarChar(250)
+  orden     Int?      @db.TinyInt
+  created   DateTime? @db.DateTime(0)
+  modified  DateTime? @db.DateTime(0)
+  ramas     ramas[]
 }
 
-model stock_supplies {
-  stock_supply_id Int      @id @default(autoincrement())
-  supply_id       Int
-  quantity        Int
-  supplies        supplies @relation(fields: [supply_id], references: [supply_id], onUpdate: Restrict, map: "stock_supplies_ibfk_1")
-
-  @@index([supply_id], map: "supply_id")
+model categoriasviejas {
+  id        Int       @id @default(autoincrement())
+  nombre_es String    @db.VarChar(250)
+  nombre_en String    @db.VarChar(250)
+  clave_es  String    @db.VarChar(250)
+  clave_en  String    @db.VarChar(250)
+  orden     Int?      @db.TinyInt
+  created   DateTime? @db.DateTime(0)
+  modified  DateTime? @db.DateTime(0)
 }
 
-model suppliers {
-  supplier_id Int        @id @default(autoincrement())
-  name        String     @db.VarChar(100)
-  location    String     @db.VarChar(255)
-  email       String     @db.VarChar(100)
-  website     String     @db.VarChar(100)
-  phone       String     @db.VarChar(20)
-  supplies    supplies[]
+model certificaciones {
+  id                       Int                        @id @default(0)
+  titulo_es                String                     @db.VarChar(250)
+  titulo_en                String                     @db.VarChar(250)
+  url                      String                     @db.VarChar(250)
+  imagen                   String                     @db.VarChar(100)
+  imagen_hd                String                     @db.VarChar(100)
+  imagen_ultra             String                     @db.VarChar(100)
+  orden                    Int?                       @default(0) @db.TinyInt
+  created                  DateTime?                  @db.DateTime(0)
+  modified                 DateTime?                  @db.DateTime(0)
+  certificaciones_familias certificaciones_familias[]
 }
 
-model supplies {
-  supply_id      Int              @id @default(autoincrement())
-  supplier_id    Int
-  package_id     Int
-  price          Decimal          @db.Decimal(10, 2)
-  bar_code       String           @db.VarChar(50)
-  description    String           @db.Text
-  package_type   String           @db.VarChar(50)
-  stock_supplies stock_supplies[]
-  suppliers      suppliers        @relation(fields: [supplier_id], references: [supplier_id], onUpdate: Restrict, map: "supplies_ibfk_1")
-  packages       packages         @relation(fields: [package_id], references: [package_id], onUpdate: Restrict, map: "supplies_ibfk_2")
+model certificaciones_familias {
+  id               Int             @id @default(autoincrement())
+  familia_id       Int
+  certificacion_id Int
+  certificaciones  certificaciones @relation(fields: [certificacion_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_certificaciones_familias_certificaciones")
+  familias         familias        @relation(fields: [familia_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_certificaciones_familias_familias")
 
-  @@index([package_id], map: "package_id")
-  @@index([supplier_id], map: "supplier_id")
+  @@index([certificacion_id], map: "FK_certificaciones_familias_certificaciones")
+  @@index([familia_id], map: "FK_certificaciones_familias_familias")
+}
+
+model codigocolores {
+  id          Int       @id @default(autoincrement())
+  nombre      String    @db.VarChar(100)
+  html        String    @db.VarChar(250)
+  regex       String    @db.VarChar(250)
+  imagen      String    @db.VarChar(250)
+  imagen_cmyk String    @db.VarChar(250)
+  created     DateTime? @db.DateTime(0)
+  modified    DateTime? @db.DateTime(0)
+}
+
+model eventos {
+  id        Int       @id @default(autoincrement())
+  nombre    String    @db.VarChar(255)
+  url_es    String    @db.VarChar(255)
+  url_en    String    @db.VarChar(255)
+  imagen_es String    @db.VarChar(255)
+  imagen_en String    @db.VarChar(255)
+  orden     Int?      @default(0)
+  created   DateTime? @default(now()) @db.DateTime(0)
+  modified  DateTime? @default(now()) @db.DateTime(0)
+}
+
+model familias {
+  id                             Int                        @id @default(autoincrement())
+  subcategoria_id                Int
+  numero_serie                   String                     @db.VarChar(255)
+  modificador_id                 Int?
+  clave_es                       String                     @unique(map: "clave_es") @db.VarChar(100)
+  clave_en                       String                     @unique(map: "clave_en") @db.VarChar(100)
+  marca_id                       Int
+  subtitulo_es                   String                     @db.VarChar(250)
+  subtitulo_en                   String                     @db.VarChar(250)
+  dimensiones                    String                     @default("'mm2'") @db.VarChar(64)
+  tipo                           String                     @db.VarChar(255)
+  caracteristicas_especiales_es  String                     @db.VarChar(255)
+  caracteristica_especial_pdf_es String                     @db.VarChar(100)
+  caracteristica_especial_pdf_en String                     @db.VarChar(100)
+  caracteristicas_especiales_en  String                     @db.VarChar(255)
+  imagencable                    String?                    @db.VarChar(250)
+  caracteristicas_es             String                     @db.Text
+  caracteristicas_es_json        String                     @db.Text
+  caracteristicas_en             String                     @db.Text
+  caracteristicas_en_json        String                     @db.Text
+  identificacion_es              String                     @db.Text
+  identificacion_es_json         String                     @db.Text
+  identificacion_en              String                     @db.Text
+  identificacion_en_json         String                     @db.Text
+  variantes_es                   String                     @db.Text
+  variantes_es_json              String                     @db.Text
+  variantes_en                   String                     @db.Text
+  variantes_en_json              String                     @db.Text
+  pdf_archivo_es                 String?                    @db.VarChar(250)
+  pdf_archivo_en                 String?                    @db.VarChar(250)
+  visible                        Boolean
+  jsondata                       String?                    @db.MediumText
+  ultima_actualizacion_json_data DateTime?                  @db.DateTime(0)
+  ultima_actualizacion_familia   DateTime?                  @db.DateTime(0)
+  ultima_actualizacion_pdf_es    DateTime?                  @db.DateTime(0)
+  ultima_actualizacion_pdf_en    DateTime?                  @db.DateTime(0)
+  orden                          Int?
+  created                        DateTime?                  @db.DateTime(0)
+  modified                       DateTime?                  @db.DateTime(0)
+  aplicaciones_familias          aplicaciones_familias[]
+  certificaciones_familias       certificaciones_familias[]
+  marcas                         marcas                     @relation(fields: [marca_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_familias_marcas")
+  modificadores                  modificadores?             @relation(fields: [modificador_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_familias_modificadores")
+  subcategorias                  subcategorias              @relation(fields: [subcategoria_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_familias_subcategorias")
+  familias_iconos                familias_iconos[]
+  familias_instalaciones         familias_instalaciones[]
+  familias_propiedades           familias_propiedades[]
+  familias_ramas                 familias_ramas[]
+  tablas                         tablas[]
+
+  @@index([marca_id], map: "FK_familias_marcas")
+  @@index([modificador_id], map: "FK_familias_modificadores")
+  @@index([subcategoria_id], map: "FK_familias_subcategorias")
+}
+
+model familias_iconos {
+  id         Int      @id @default(autoincrement())
+  familia_id Int
+  icono_id   Int
+  familias   familias @relation(fields: [familia_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_familias_iconos_familias")
+  iconos     iconos   @relation(fields: [icono_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_familias_iconos_iconos")
+
+  @@index([familia_id], map: "FK_familias_iconos_familias")
+  @@index([icono_id], map: "FK_familias_iconos_iconos")
+}
+
+model familias_instalaciones {
+  id             Int           @id @default(autoincrement())
+  familia_id     Int
+  instalacion_id Int
+  created        DateTime      @default(now()) @db.DateTime(0)
+  modified       DateTime      @default(now()) @db.DateTime(0)
+  familias       familias      @relation(fields: [familia_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_familias_instalaciones_familias")
+  instalaciones  instalaciones @relation(fields: [instalacion_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_familias_instalaciones_instalaciones")
+
+  @@index([familia_id], map: "FK_familias_instalaciones_familias")
+  @@index([instalacion_id], map: "FK_familias_instalaciones_instalaciones")
+}
+
+model familias_propiedades {
+  id           Int         @id @default(autoincrement())
+  familia_id   Int
+  propiedad_id Int
+  familias     familias    @relation(fields: [familia_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_familias_propiedades_familias")
+  propiedades  propiedades @relation(fields: [propiedad_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_familias_propiedades_propiedades")
+
+  @@index([familia_id], map: "FK_familias_propiedades_familias")
+  @@index([propiedad_id], map: "FK_familias_propiedades_propiedades")
+}
+
+model familias_ramas {
+  id         Int      @id @default(autoincrement())
+  familia_id Int
+  rama_id    Int
+  created    DateTime @default(now()) @db.DateTime(0)
+  modified   DateTime @default(now()) @db.DateTime(0)
+  familias   familias @relation(fields: [familia_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_familias_ramas_familias")
+  ramas      ramas    @relation(fields: [rama_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_familias_ramas_ramas")
+
+  @@index([familia_id], map: "FK_familias_ramas_familias")
+  @@index([rama_id], map: "FK_familias_ramas_ramas")
+}
+
+model iconos {
+  id              Int               @id @default(autoincrement())
+  titulo_es       String            @db.VarChar(250)
+  titulo_en       String            @db.VarChar(250)
+  imagen          String            @db.VarChar(255)
+  imagen_hd       String            @db.VarChar(100)
+  imagen_ultra    String            @db.VarChar(100)
+  orden           Int?              @db.TinyInt
+  created         DateTime?         @db.DateTime(0)
+  modified        DateTime?         @db.DateTime(0)
+  familias_iconos familias_iconos[]
+}
+
+model identificaciones {
+  id       Int       @id @default(autoincrement())
+  clave    String?   @db.VarChar(50)
+  imagen   String?   @db.VarChar(100)
+  imagenHD String?   @db.VarChar(100)
+  created  DateTime? @default(now()) @db.DateTime(0)
+  modified DateTime? @default(now()) @db.DateTime(0)
+}
+
+model instalaciones {
+  id                     Int                      @id @default(autoincrement())
+  nombre_es              String                   @db.VarChar(255)
+  nombre_en              String                   @db.VarChar(255)
+  imagen_es              String                   @db.VarChar(255)
+  imagen_en              String                   @db.VarChar(255)
+  imagen_es_hd           String                   @db.VarChar(100)
+  imagen_es_ultra        String                   @db.VarChar(100)
+  imagen_en_hd           String                   @db.VarChar(100)
+  imagen_en_ultra        String                   @db.VarChar(100)
+  orden                  Int                      @db.TinyInt
+  created                DateTime                 @default(now()) @db.DateTime(0)
+  modified               DateTime                 @default(now()) @db.DateTime(0)
+  familias_instalaciones familias_instalaciones[]
+}
+
+model marcas {
+  id                  Int        @id @default(autoincrement())
+  nombre              String     @db.VarChar(255)
+  clave               String     @db.VarChar(255)
+  color               String     @db.VarChar(10)
+  colorCmyk           String     @db.VarChar(255)
+  descripcion_es      String     @db.VarChar(255)
+  descripcion_en      String     @db.VarChar(255)
+  imagen_color        String     @db.VarChar(100)
+  imagen_negro        String     @db.VarChar(100)
+  imagen_texto_negro  String     @db.VarChar(100)
+  imagen_texto_blanco String     @db.VarChar(100)
+  imagen_logo         String     @db.VarChar(100)
+  baseline            Float      @default(0) @db.Float
+  created             DateTime?  @default(now()) @db.DateTime(0)
+  modified            DateTime?  @default(now()) @db.DateTime(0)
+  familias            familias[]
+}
+
+model modificadores {
+  id          Int        @id @default(autoincrement())
+  clave       String     @db.VarChar(100)
+  nombre      String     @db.VarChar(255)
+  descripcion String     @db.VarChar(255)
+  created     DateTime   @default(now()) @db.DateTime(0)
+  modified    DateTime   @default(now()) @db.DateTime(0)
+  familias    familias[]
+}
+
+model propiedades {
+  id                   Int                    @id @default(autoincrement())
+  nombre_es            String                 @db.VarChar(255)
+  nombre_en            String                 @db.VarChar(255)
+  orden                Int
+  created              DateTime?              @default(now()) @db.DateTime(0)
+  modified             DateTime?              @default(now()) @db.DateTime(0)
+  familias_propiedades familias_propiedades[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ramas {
+  id             Int              @id @default(autoincrement())
+  ruta_es        String           @db.VarChar(255)
+  ruta_en        String           @db.VarChar(255)
+  categoria_id   Int
+  created        DateTime         @default(now()) @db.DateTime(0)
+  modified       DateTime         @default(now()) @db.DateTime(0)
+  familias_ramas familias_ramas[]
+  categorias     categorias       @relation(fields: [categoria_id], references: [id], onUpdate: Restrict, map: "ramas_ibfk_1")
+
+  @@index([categoria_id], map: "id_categoria")
+}
+
+model recomendaciones {
+  id        Int    @id @default(autoincrement())
+  titulo_es String @db.VarChar(250)
+  titulo_en String @db.VarChar(250)
+  clave_es  String @unique(map: "clave_es") @db.VarChar(100)
+  clave_en  String @unique(map: "clave_en") @db.VarChar(100)
+  texto_es  String @db.MediumText
+  texto_en  String @db.MediumText
+  orden     Int?
+}
+
+model subcategorias {
+  id                Int        @id @default(autoincrement())
+  categoriavieja_id Int
+  nombre_es         String     @db.VarChar(250)
+  nombre_en         String     @db.VarChar(250)
+  fondo             String     @db.VarChar(100)
+  orden             Int?       @db.TinyInt
+  created           DateTime?  @db.DateTime(0)
+  modified          DateTime?  @db.DateTime(0)
+  familias          familias[]
+}
+
+model tablas {
+  id                Int       @id @default(autoincrement())
+  familia_id        Int
+  grupo_es          String    @db.VarChar(250)
+  grupo_en          String    @db.VarChar(250)
+  titulo_es         String    @db.VarChar(250)
+  titulo_en         String    @db.VarChar(250)
+  html_es           String    @db.Text
+  html_en           String    @db.Text
+  json_es           String    @db.Text
+  json_en           String    @db.Text
+  notaspie_es       String    @db.Text
+  notaspie_en       String    @db.Text
+  ancho_columnas_es String?   @db.VarChar(250)
+  ancho_columnas_en String?   @db.VarChar(250)
+  orden             Int?      @db.TinyInt
+  created           DateTime? @db.DateTime(0)
+  modified          DateTime? @db.DateTime(0)
+  familias          familias  @relation(fields: [familia_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_tablas_familias")
+
+  @@index([familia_id], map: "FK_tablas_familias")
 }

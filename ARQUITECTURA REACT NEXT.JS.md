@@ -48,6 +48,7 @@ Otra ventaja de Redux era el devtool tab que visualmente podia debugearse muy bi
 JOTAI-ROCOIL ( cuando el estado cambia sin operaciones, no hay machine)
 ZUSTAND ( cuando hay logica en el medio para cambiar el estado)
 REDUX ( abarca todo, pero es burocratico, lento pogramar, y pesa mucho mas)
+
 XSTATE ( STATE MACHINE, MUY BONITO PERO ACOMPLEJIZA TODO PARA COSAS SIMPLES.. solo sirve para logicas complicadas que se necesiten visualizar mas )
 
 Cuidado you can stop using redux:
@@ -80,9 +81,6 @@ conveniente.
 
 Deploying next.js
 https://nextjs.org/docs/pages/building-your-application/deploying
-
-BAAS
-Serveless vs edge functions
 
 Volviendo a NEXT.JS VERCEL
 
@@ -130,6 +128,8 @@ si este ultimo necesitas cosas del browser, o javascript , hay que separarlo par
 
 Si uno quiere hacer fecth desde el cliente, sin tener que volver o pasar x el STATE, ( useEffects, y problemas mencionados), hay que usar o SWR de next.js , o react query.
 
+Server Components are a separate (but complementary) technology from Server Rendering (SSR). Server Components let you run some of your components purely on the server. SSR, on the other hand, lets you generate HTML before any JavaScript loads. This demo only shows Server Components, and not SSR. Because it doesn't have SSR, the initial page load in this demo has a client-server network waterfall, and will be much slower than any SSR framework. However, Server Components are meant to be integrated together with SSR, and they will be in a future release.
+
 SERVER COMPONENT CACHE FETCH
 ┌ GET /marcas 200 in 288ms
 │
@@ -147,3 +147,137 @@ SERVER COMPONENT CACHE FETCH
 - ┌ GET /marcas 200 in 1421ms
   │
   └──── GET https://www.marlew.com.a../api/queries/getBrands.j.. 200 in 941ms (cache: MISS)
+
+MUTATION VS USESTATE VS USEFORM
+
+React Query is a library that provides a way to manage data in React applications. It is used to fetch data from an API and cache it in memory. React Query also provides a way to mutate data on the server using the useMutation hook1.
+
+The useMutation hook returns an array with two elements: the first element is a function that you can call to mutate the data on the server, and the second element is an object that contains information about the mutation, such as whether it is currently loading1.
+
+React Query mutations allow you to avoid using the useState or useForm hook to keep a form render with their values2. Instead, you can use the useMutation hook to mutate data on the server and update your form accordingly1.
+
+I hope this helps! Let me know if you have any other questions.
+
+FORM DATA
+
+`FormData` is a built-in JavaScript object that provides a convenient way to construct and manipulate data in HTML forms. It allows you to create a set of key-value pairs representing form fields and their values.
+
+The `FormData` object can be used to capture data entered in HTML form elements, such as `<input>`, `<textarea>`, and `<select>`. It provides methods to append, retrieve, and manipulate form data before sending it to a server.
+
+`FormData` is supported in modern browsers and is part of the Fetch API, which is used for making HTTP requests in JavaScript.
+
+Here's an example of how to use `FormData`:
+
+```javascript
+const form = document.querySelector('form');
+const formData = new FormData(form);
+
+formData.append('additionalField', 'additionalValue');
+
+// Iterate over form data
+for (const entry of formData.entries()) {
+  const [name, value] = entry;
+  console.log(`${name}: ${value}`);
+}
+```
+
+In this example, we create a new `FormData` object by passing a reference to an HTML form element (`form`) as an argument. We can then use various methods, such as `append()`, to add additional fields to the form data. The `entries()` method allows us to iterate over the form data and access each key-value pair.
+
+`FormData` is commonly used when sending form data via AJAX requests or when constructing multipart/form-data requests for file uploads. It provides a convenient way to gather form data and prepare it for sending to a server.
+
+Note that `FormData` is different from JSON. While JSON represents data as a string, `FormData` is specifically designed for handling form data and supports files, binary data, and multiple values for the same field name.
+
+VALIDATION
+
+Joi, Yup, and AJV (Another JSON Schema Validator) are all popular libraries used for validating and enforcing schema constraints in JavaScript applications. While they serve a similar purpose, there are some differences in their features and usage. Here's a brief comparison of these libraries:
+
+Joi:
+
+Joi is a powerful schema description language and data validator for JavaScript.
+It allows you to define complex validation rules using a fluent API and supports a wide range of validation types, including string, number, date, boolean, object, array, and more.
+Joi provides a rich set of built-in validation methods and allows for custom validation rules.
+It offers features like conditional validation, schema composition, error messages customization, and more.
+Joi is widely used and has a strong ecosystem of plugins and integrations.
+It can be used both on the client-side and server-side (Node.js).
+Yup:
+
+Yup is a schema validation library that focuses on simplicity and ease of use.
+It provides a simple API for defining schemas and validating data against those schemas.
+Yup supports basic validation types such as string, number, boolean, array, object, and date, and offers various validation methods for each type.
+It supports asynchronous validation and conditional validation.
+Yup allows for custom validation functions and error messages customization.
+It is widely used in React and React Native applications, but can also be used in Node.js.
+AJV:
+
+AJV is a fast and efficient JSON Schema validator for JavaScript.
+It fully supports the JSON Schema standard and provides a complete implementation of the specification.
+AJV offers powerful validation capabilities, including data validation, data coercion, and data normalization.
+It focuses on speed and provides excellent performance.
+AJV is particularly popular in the Node.js ecosystem.
+It supports asynchronous validation, custom keywords, and error messages customization.
+AJV has a large user community and supports various JSON Schema draft versions.
+Choosing the right library depends on your specific requirements and preferences. If you need advanced features, extensive validation options, and a rich ecosystem, Joi might be a good choice. If simplicity and ease of use are your primary concerns, Yup provides a straightforward API. If you want full compliance with the JSON Schema standard and excellent performance, AJV is a solid option. Consider the features, documentation, community support, and ecosystem of each library to determine which one best fits your project.
+
+EJEMPLO VALIDATION
+
+import { useForm } from 'react-hook-form';
+import \* as yup from 'yup';
+
+const schema = yup.object().shape({
+name: yup.string().required('Name is required'),
+email: yup.string().email('Invalid email').required('Email is required'),
+});
+
+const YourComponent = () => {
+const { register, handleSubmit, formState: { errors } } = useForm({
+resolver: yupResolver(schema),
+});
+
+const onSubmit = (data) => {
+// Handle form submission
+console.log(data);
+};
+
+return (
+
+<form onSubmit={handleSubmit(onSubmit)}>
+{/_ Form inputs _/}
+<input type="text" {...register('name')} placeholder="Name" />
+{errors.name && <p>{errors.name.message}</p>}
+
+      <input type="email" {...register('email')} placeholder="Email" />
+      {errors.email && <p>{errors.email.message}</p>}
+
+      {/* Submit button */}
+      <button type="submit">Submit</button>
+    </form>
+
+);
+};
+
+ZACT ( validacion de server action en NEXT.js)
+
+WEBPACK REEMPLACMENT
+
+VITE.JS ( HMR , ESM modules in DEV , muy general podes hacer un proyecto en vanilla js, vue, react.. me gusta
+para backends)
+
+ASTRO / GATSBY SSG( usas todas las ventajas de react modules pero te genera un STATIC SITE , HTML , SIN SSR PERO YA TE DA EL HTML , rapido para web) ASTRO ES EL MAS SIMPLE SEGUN LOS YOUTUBERS
+
+NEXT.JS SSR-SSG LARGE SCALE APPLICATION ( HACE TODO pero muy configurable , todo al mismo tiempo, partes SSR, otras partes ) ademas tiene todas las ventajas de facil ruteo, facil API , server functions, server components.
+
+REMIX FULL-STACK( mete la capa de base de datos tambien) , ejemplo con next.js tenes que hacerte cargo
+de la capa de base de datos x ejemplo con prisma
+
+SHARED COMPONENTS ( PUEDEN FUNCIONAR EN EL SERVER O EL CLIENTE)
+
+NUEVOS HOOKS MUY UTILES
+
+useForm, useTransition, useOptimistic
+controller component
+Components defaults para server components
+<Suspense> lets you display a fallback until its children have finished loading.
+
+<Suspense fallback={<Loading />}>
+<SomeComponent />
+</Suspense>
